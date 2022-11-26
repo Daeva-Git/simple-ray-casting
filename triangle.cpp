@@ -1,57 +1,76 @@
+#include <iostream>
 #include <string>
+#include "libs/glm/glm.hpp"
 using namespace std;
 
-class Triangle {
+class Triangle
+{
 public:
-    float* vertices;
-    int* indices;
+    glm::vec3 color;
+    glm::vec3 vertices[3];
 
-    Triangle()
+    Triangle(glm::vec3 color)
     {
-        vertices = getVertices();
-        indices = getIndices();
+        setUnitVertices();
+        this->color = color;
     }
 
-    float intersect()
+    void setVertices(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2)
     {
-        return 0;
+        vertices[0] = v0;
+        vertices[1] = v1;
+        vertices[2] = v2;
     }
 
-    float* move() {
-        for (int i = 0; i < sizeof(vertices); i++)
-        {
-            vertices[i] += 1;
-        }
-        return vertices;
+    void setUnitVertices()
+    {
+        vertices[0] = glm::vec3(-0.5, 0.5, -1);
+        vertices[1] = glm::vec3(0, -0.5, -1);
+        vertices[2] = glm::vec3(0.5, 0.5, -1);
     }
 
-    float* getVertices() {
-        float* vertices = new float[3 * 6];
-        setPoint(vertices, 0, -0.5f, 0, 0, 0, 0, 0);
-        setPoint(vertices, 1, 0.5f, 0, 0, 0, 0, 0);
-        setPoint(vertices, 2, 0, 1, 0, 0, 0, 0);
-        return vertices;
+    static bool checkIntersection(Triangle triangle, Ray ray, float &t, float &u, float &v)
+    {
+        glm::vec3 v0 = triangle.vertices[0];
+        glm::vec3 v1 = triangle.vertices[1];
+        glm::vec3 v2 = triangle.vertices[2];
+
+        return checkIntersection(ray.orig, ray.dir, v0, v1, v2, t, u, v);
     }
 
-    int* getIndices() {
-        int* indices = new int[3];
-        indices[0] = 0;
-        indices[1] = 1;
-        indices[2] = 2;
-        return indices;
-    }
+    static bool checkIntersection(
+        const glm::vec3 &orig, const glm::vec3 &dir,
+        const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2,
+        float &t, float &u, float &v)
+    {
+        glm::vec3 v0v1 = v1 - v0;
+        glm::vec3 v0v2 = v2 - v0;
+        glm::vec3 pvec = glm::cross(dir, v0v2);
+        float det = glm::dot(v0v1, pvec);
 
-    void setPoint(float* coordinates, int index, float x, float y, float z, float r, float g, float b) {
-        index *= 6;
+        // if the determinant is negative the triangle is 'back facing'
+        // if the determinant is close to 0, the ray misses the triangle
+        if (det < 1e-8)
+            return false;
 
-        // set position
-        coordinates[index] = x;
-        coordinates[index + 1] = y;
-        coordinates[index + 2] = z;
+        // ray and triangle are parallel if det is close to 0
+        if (fabs(det) < 1e-8)
+            return false;
 
-        // color
-        coordinates[index + 3] = r;
-        coordinates[index + 4] = g;
-        coordinates[index + 5] = b;
+        float invDet = 1 / det;
+
+        glm::vec3 tvec = orig - v0;
+        u = glm::dot(tvec, pvec) * invDet;
+        if (u < 0 || u > 1)
+            return false;
+
+        glm::vec3 qvec = glm::cross(tvec, v0v1);
+        v = glm::dot(dir, qvec) * invDet;
+        if (v < 0 || u + v > 1)
+            return false;
+
+        t = glm::dot(v0v2, qvec) * invDet;
+
+        return true;
     }
 };
