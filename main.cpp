@@ -19,8 +19,10 @@ Ray constructRayThroughPixel(Camera camera, int x, int y, int width, int height)
     float tanA = tan(glm::radians(camera.fov * 0.5));
 
     float aspectRatio = width / height;
-    float pixelCameraX = (2 * pixelScreenX - 1) * aspectRatio * tanA;
-    float pixelCameraY = (1 - 2 * pixelScreenY) * tanA;
+    // float pixelCameraX = (2 * pixelScreenX - 1) * aspectRatio * tanA;
+    // float pixelCameraY = (1 - 2 * pixelScreenY) * tanA;
+    float pixelCameraX = 2 * pixelScreenX * aspectRatio * tanA;
+    float pixelCameraY = 2 * pixelScreenY * tanA;
 
     glm::vec3 dir(pixelCameraX, pixelCameraY, -1);
     glm::normalize(dir);
