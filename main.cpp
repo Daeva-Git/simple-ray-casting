@@ -1,5 +1,6 @@
 #include <iostream>
 #include "libs/glm/glm.hpp"
+#include "camera.cpp"
 #include "ray.cpp"
 #include "triangle.cpp"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -7,7 +8,7 @@
 
 using namespace std;
 
-Ray constructRayThroughPixel(int camera, int x, int y, int width, int height)
+Ray constructRayThroughPixel(Camera camera, int x, int y, int width, int height)
 {
     float pixelNDCx = (x + 0.5) / width;
     float pixelNDCy = (y + 0.5) / height;
@@ -16,8 +17,7 @@ Ray constructRayThroughPixel(int camera, int x, int y, int width, int height)
     float pixelScreenY = 1 - 2 * pixelNDCy;
 
     // for fov 90
-    // float tanA = tan(M_PI / 4);
-    float tanA = 1;
+    float tanA = tan(glm::radians(camera.fov * 0.5));
 
     float aspectRatio = width / height;
     float pixelCameraX = (2 * pixelScreenX - 1) * aspectRatio * tanA;
@@ -25,20 +25,18 @@ Ray constructRayThroughPixel(int camera, int x, int y, int width, int height)
 
     glm::vec3 dir(pixelCameraX, pixelCameraY, -1);
     glm::normalize(dir);
-    glm::vec3 orig(0, 0, 0);
 
-    Ray ray(orig, dir);
+    Ray ray(camera.origin, dir);
 
     return ray;
 }
 
-void rayCast(unsigned char *image, int width, int height, Triangle *traingles)
+void rayCast(unsigned char *image, int width, int height, Camera camera, Triangle *traingles)
 {
     for (int y = 0; y < height; y++)
     {
         for (int x = 0; x < width; x++)
         {
-            int camera = 0;
             const Ray ray = constructRayThroughPixel(camera, x, y, width, height);
 
             float t_min = INFINITY;
@@ -46,8 +44,8 @@ void rayCast(unsigned char *image, int width, int height, Triangle *traingles)
             {
                 const Triangle triangle = traingles[i];
 
-                float t, u, v;
-                bool intersects = Triangle::checkIntersection(triangle, ray, t, u, v);
+                float t;
+                bool intersects = Triangle::checkIntersection(triangle, ray, t);
 
                 cout << "test" << endl;
                 if (intersects && t_min > t)
@@ -66,8 +64,8 @@ void rayCast(unsigned char *image, int width, int height, Triangle *traingles)
 
 int main()
 {
-    const int width = 1000;
-    const int height = 1000;
+    const int width = 256;
+    const int height = 256;
 
     cout << "casting rays" << endl;
     Triangle triangleOne(glm::vec3(0, 255, 0));
@@ -84,13 +82,15 @@ int main()
                               glm::vec3(1.5f, -1.0f, -5.0f),
                               glm::vec3(0.5f, 1.0f, -5.0f));
 
+    Camera camera(glm::vec3(0, 0, 0), 90);
+
     Triangle triangles[3] = {
         triangleOne,
         triangleTwo,
         triangleThree};
 
     unsigned char image[width * height * 3] = {0};
-    rayCast(image, width, height, triangles);
+    rayCast(image, width, height, camera, triangles);
 
     stbi_write_bmp("output.bmp", width, height, 3, image);
     return 0;
