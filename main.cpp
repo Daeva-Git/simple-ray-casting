@@ -39,7 +39,7 @@ void rayCast(unsigned char *image, int width, int height, Camera camera, Triangl
         {
             const Ray ray = constructRayThroughPixel(camera, x, y, width, height);
 
-            float t_min = INFINITY;
+            float tMin = INFINITY;
             for (int i = 0; i < 3; i++)
             {
                 const Triangle triangle = traingles[i];
@@ -47,9 +47,9 @@ void rayCast(unsigned char *image, int width, int height, Camera camera, Triangl
                 float t;
                 bool intersects = Triangle::checkIntersection(triangle, ray, t);
 
-                if (intersects && t_min > t)
+                if (intersects && tMin > t)
                 {
-                    t_min = t;
+                    tMin = t;
 
                     int index = (width * y + x) * 3;
                     image[index] = triangle.color.x;
