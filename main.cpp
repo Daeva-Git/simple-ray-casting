@@ -47,7 +47,6 @@ void rayCast(unsigned char *image, int width, int height, Camera camera, Triangl
                 float t;
                 bool intersects = Triangle::checkIntersection(triangle, ray, t);
 
-                cout << "test" << endl;
                 if (intersects && t_min > t)
                 {
                     t_min = t;
@@ -67,7 +66,6 @@ int main()
     const int width = 256;
     const int height = 256;
 
-    cout << "casting rays" << endl;
     Triangle triangleOne(glm::vec3(0, 255, 0));
     Triangle triangleTwo(glm::vec3(255, 0, 0));
     Triangle triangleThree(glm::vec3(0, 0, 255));
@@ -75,9 +73,9 @@ int main()
     triangleOne.setVertices(glm::vec3(-1.5f, -1.0f, -5.0f),
                             glm::vec3(0.5f, -1.0f, -5.0f),
                             glm::vec3(-0.5f, 1.0f, -5.0f));
-    triangleTwo.setVertices(glm::vec3(-1.0f, -1.0f, -5.0),
-                            glm::vec3(1.0f, -1.0f, -5.0),
-                            glm::vec3(0.0f, 1.0f, -5.0));
+    triangleTwo.setVertices(glm::vec3(-1.0f, -1.0f, -5.0f),
+                            glm::vec3(1.0f, -1.0f, -5.0f),
+                            glm::vec3(0.0f, 1.0f, -5.0f));
     triangleThree.setVertices(glm::vec3(-0.5f, -1.0f, -5.0f),
                               glm::vec3(1.5f, -1.0f, -5.0f),
                               glm::vec3(0.5f, 1.0f, -5.0f));
