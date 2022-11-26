@@ -14,9 +14,9 @@ Ray constructRayThroughPixel(Camera camera, int x, int y, int width, int height)
     float pixelNDCy = (y + 0.5) / height;
 
     float pixelScreenX = 2 * pixelNDCx - 1;
-    float pixelScreenY = 1 - 2 * pixelNDCy;
+    // float pixelScreenY = 1 - 2 * pixelNDCy;
+    float pixelScreenY = 2 * pixelNDCy;
 
-    // for fov 90
     float tanA = tan(glm::radians(camera.fov * 0.5));
 
     float aspectRatio = width / height;
@@ -47,7 +47,7 @@ void rayCast(unsigned char *image, int width, int height, Camera camera, Triangl
                 float t;
                 bool intersects = Triangle::checkIntersection(triangle, ray, t);
 
-                if (intersects && tMin > t)
+                if (intersects && tMin >= t)
                 {
                     tMin = t;
 
@@ -66,26 +66,30 @@ int main()
     const int width = 256;
     const int height = 256;
 
-    Triangle triangleOne(glm::vec3(0, 255, 0));
-    Triangle triangleTwo(glm::vec3(255, 0, 0));
-    Triangle triangleThree(glm::vec3(0, 0, 255));
+    Triangle redTriangle;
+    Triangle greenTriangle;
+    Triangle blueTriangle;
 
-    triangleOne.setVertices(glm::vec3(-1.5f, -1.0f, -5.0f),
-                            glm::vec3(0.5f, -1.0f, -5.0f),
-                            glm::vec3(-0.5f, 1.0f, -5.0f));
-    triangleTwo.setVertices(glm::vec3(-1.0f, -1.0f, -5.0f),
-                            glm::vec3(1.0f, -1.0f, -5.0f),
-                            glm::vec3(0.0f, 1.0f, -5.0f));
-    triangleThree.setVertices(glm::vec3(-0.5f, -1.0f, -5.0f),
-                              glm::vec3(1.5f, -1.0f, -5.0f),
-                              glm::vec3(0.5f, 1.0f, -5.0f));
+    redTriangle.setColor(glm::vec3(255, 0, 0));
+    greenTriangle.setColor(glm::vec3(0, 255, 0));
+    blueTriangle.setColor(glm::vec3(0, 0, 255));
 
-    Camera camera(glm::vec3(0, 0, 0), 90);
+    redTriangle.setVertices(glm::vec3(-1.0, -0.8, -4.9),
+                            glm::vec3(1, -0.8, -4.9),
+                            glm::vec3(0, 1, -4.9));
+    greenTriangle.setVertices(glm::vec3(-1.5, -1, -4.8),
+                              glm::vec3(0.5, -1, -4.8),
+                              glm::vec3(-0.5, 1, -4.8));
+    blueTriangle.setVertices(glm::vec3(-2, -0.5, -4.7),
+                             glm::vec3(1.7, -0.7, -5),
+                             glm::vec3(0.5, 0.7, -5));
+
+    Camera camera(glm::vec3(0, 0, 0), 50);
 
     Triangle triangles[3] = {
-        triangleOne,
-        triangleTwo,
-        triangleThree};
+        greenTriangle,
+        redTriangle,
+        blueTriangle};
 
     unsigned char image[width * height * 3] = {0};
     rayCast(image, width, height, camera, triangles);

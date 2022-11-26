@@ -9,24 +9,15 @@ public:
     glm::vec3 color;
     glm::vec3 vertices[3];
 
-    Triangle(glm::vec3 color)
-    {
-        setUnitVertices();
+    void setColor (glm::vec3 color) {
         this->color = color;
     }
 
     void setVertices(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2)
     {
-        vertices[0] = v0;
-        vertices[1] = v1;
-        vertices[2] = v2;
-    }
-
-    void setUnitVertices()
-    {
-        vertices[0] = glm::vec3(-0.5, 0.5, -1);
-        vertices[1] = glm::vec3(0, -0.5, -1);
-        vertices[2] = glm::vec3(0.5, 0.5, -1);
+        this->vertices[0] = v0;
+        this->vertices[1] = v1;
+        this->vertices[2] = v2;
     }
 
     static bool checkIntersection(Triangle triangle, Ray ray, float &t)
