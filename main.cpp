@@ -14,8 +14,7 @@ Ray constructRayThroughPixel(Camera camera, int x, int y, int width, int height)
     float pixelNDCy = (y + 0.5) / height;
 
     float pixelScreenX = 2 * pixelNDCx - 1;
-    // float pixelScreenY = 1 - 2 * pixelNDCy;
-    float pixelScreenY = 2 * pixelNDCy;
+    float pixelScreenY = 1 - 2 * pixelNDCy;
 
     float tanA = tan(glm::radians(camera.fov * 0.5));
 
@@ -63,8 +62,8 @@ void rayCast(unsigned char *image, int width, int height, Camera camera, Triangl
 
 int main()
 {
-    const int width = 256;
-    const int height = 256;
+    const int width = 512;
+    const int height = 512;
 
     Triangle redTriangle;
     Triangle greenTriangle;
